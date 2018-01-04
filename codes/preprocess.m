@@ -5,10 +5,10 @@ bn = imbinarize(imread('0_b.tif'));
 
 
 height = 3000;
-y_interval = 251;
+y_interval = 101;
 
 width = 3000;
-x_interval = 251;
+x_interval = 101;
 
 n = 1;
 

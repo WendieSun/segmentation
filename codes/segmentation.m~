@@ -135,24 +135,9 @@ test_bin = imread('0_b.tif');
 test_img = test_img(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
 test_bin = test_bin(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
 
-n = 1;
-
 for i = x_interval + 1 : x_interval + img_width
     for j = y_interval + 1 : y_interval + img_height
-        
-        x_start = x_interval + i;
-        y_start = y_interval + i;
-        
-        input = test_img(y_start : y_start + img_height - 1, x_start : x_start + img_width - 1, y_start);
-        
-        
-        
-    end
-end
-
-        
-        
-test_pred = predict_MA(Theta1, Theta2, X_test, y_test, threshold);
+        input = test_img()
 
 
 

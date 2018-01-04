@@ -4,8 +4,8 @@ function pred = predict_MA(Theta1, Theta2, X, y, threshold)
 %   trained weights of a neural network (Theta1, Theta2)
 
 % size of the image
-WIDTH = 251;
-HEIGHT = 251;
+% WIDTH = 251;
+% HEIGHT = 251;
 
 % m: number of samples
 m = size(X, 1);
