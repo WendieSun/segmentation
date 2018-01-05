@@ -1,17 +1,17 @@
 
-% DATASET_SIZE = 841;
+% DATASET_SIZE = 119;
 
-TRAINING_START = 100;
+TRAINING_START = 25;
 NUM_OF_TRAINING = 35;
 NUM_OF_TEST =15;
 
 height = 3000;
-y_interval = 101;
+y_interval = 251;
 
 width = 3000;
-x_interval = 101;
+x_interval = 251;
 
-mid_point = 51;
+mid_point = 126;
 
 n = 1;
 % num_blocks = 4*4;

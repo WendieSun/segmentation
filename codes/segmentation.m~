@@ -102,11 +102,12 @@ fprintf('Program paused. Press enter to continue.\n');
 
 % predict 
 fprintf('\npredict training dataset: \n');
-pred = predict_MA(Theta1, Theta2, X, y, threshold);
+pred = predict_MA(Theta1, Theta2, X, threshold);
+compare_result(pred, y, threshold);
 
 fprintf('\npredict new dataset: \n');
-test_pred = predict_MA(Theta1, Theta2, X_test, y_test, threshold);
-
+test_pred = predict_MA(Theta1, Theta2, X_test, threshold);
+compare_result(test_pred, test_y, threshold);
 
 % analysis
 [training_accuracy, training_precision, training_recall, training_F_score] = errorAnalysis(pred, y);
@@ -135,9 +136,24 @@ test_bin = imread('0_b.tif');
 test_img = test_img(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
 test_bin = test_bin(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
 
+n = 1;
+
 for i = x_interval + 1 : x_interval + img_width
     for j = y_interval + 1 : y_interval + img_height
-        input = test_img()
+        
+        input = test_img(j - y_interval : j + y_interval, i - x_interval : i + x_interval);
+
+        X_test(n, :) = input(:);
+
+        n = n + 1;
+        
+    end
+end
+
+
+        
+y_test = 
+test_pred = predict_MA(Theta1, Theta2, X_test, y_test, threshold);
 
 
 

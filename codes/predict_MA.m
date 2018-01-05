@@ -1,4 +1,4 @@
-function pred = predict_MA(Theta1, Theta2, X, y, threshold)
+function pred = predict_MA(Theta1, Theta2, X, threshold)
 %PREDICT Predict the label of an input given a trained neural network
 %   p = PREDICT(Theta1, Theta2, X) outputs the predicted label of X given the
 %   trained weights of a neural network (Theta1, Theta2)
@@ -26,12 +26,11 @@ a2 = [ones(1, size(a2,2)); a2];
 z3 = Theta2 * a2;
 a3 = sigmoid(z3);
 
-
-pred = (a3 >= threshold);
+pred = a3;
 % pred = pred';
 
-for i = 1 : m
-    fprintf('example %d: pred: %f -> %d, actual %d\n', i, a3(i), pred(i), y(i));
+% for i = 1 : m
+%     fprintf('example %d: pred: %f -> %d, actual %d\n', i, a3(i), pred(i), y(i));
 % display images
 % for i = 1 :4
 %     original = imread(strcat(num2str(i), '.tif'));
