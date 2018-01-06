@@ -1,59 +1,127 @@
 
-% DATASET_SIZE = 119;
+%% Initialization
+% clear ; close all; clc
 
-TRAINING_START = 25;
-NUM_OF_TRAINING = 35;
-NUM_OF_TEST =15;
 
-height = 3000;
-y_interval = 251;
 
-width = 3000;
-x_interval = 251;
+%% ============ process the images to fit into the memory ============ 
 
-mid_point = 126;
+img = imread(strcat('0.tif'));
+% img = process(img); 
+bn = imbinarize(imread('0_b.tif'));
+bn = (bn == 0);
 
-n = 1;
-% num_blocks = 4*4;
 
-for i = TRAINING_START : TRAINING_START + NUM_OF_TRAINING - 1
-    source1 = strcat(num2str(i), '.tif');
-    source2 = strcat(num2str(i), '_b.tif');
-    
-    img = imread(source1);
-    img = process(img);
-    seg = imread(source2);
-%     fprintf('image source1: %s\n', source1);
-%     fprintf('image source2: %s\n', source2);
-%     sizeOf(img);
-    X(n,:) = img(:);
-    y(n) = seg(mid_point, mid_point);
-    
-    n = n + 1;
+img_size = 3000;
 
-end
+padding = 100;
 
-          
+training_size = 100;
 
+test_size = 15;
 
 n = 1;
 
-for i = NUM_OF_TRAINING + 1 : NUM_OF_TRAINING + NUM_OF_TEST
-    source1 = strcat(num2str(i), '.tif');
-    source2 = strcat(num2str(i), '_b.tif');
+% randomly select x,y points from the image
+% ensure equal number of 0s and 1s
+
+% predict mito using grayscale
+% 
+% for m = 1 : training_size
+%     i = randi(img_size);
+%     j = randi(img_size);
+%     
+%     X_training(m) = img(i, j);
+%     y_training(m) = bn(i, j);
+%     
+% end 
+
+
+%% randomise
+
+for m = 1 : training_size/2
+    i = padding + randi(img_size - padding - 1);
+    j = padding + randi(img_size - padding - 1);
     
-    img = imread(source1);
-    img = process(img);
-    seg = imread(source2);
-%     fprintf('image source1: %s\n', source1);
-%     fprintf('image source2: %s\n', source2);
-%     sizeOf(img);
-    X_test(n,:) = img(:);
-    y_test(n) = seg(mid_point, mid_point);
+    while bn(i, j) ~= 1
+        i = padding + randi(img_size - padding - 1);
+        j = padding + randi(img_size - padding - 1);
+    end
+    
+    input = img(i - padding : i + padding, j - padding : j + padding);
+    input = process(input);
+    
+    X_training(n, :) = input(:);
+    y_training(n) = bn(i, j);
     
     n = n + 1;
+end 
+    
+n = size(X_training, 1) + 1;
 
-end
+for m = training_size/2 + 1: training_size
+    i = padding + randi(img_size - padding - 1);
+    j = padding + randi(img_size - padding - 1);
+    
+    while bn(i, j) ~= 0
+        i = padding + randi(img_size - padding - 1);
+        j = padding + randi(img_size - padding - 1);
+    end
+    
+    input = img(i - padding : i + padding, j - padding : j + padding);
+    input = process(input);
+    
+    X_training(n, :) = input(:);
+    y_training(n) = bn(i, j);
+    
+    n = n + 1;
+end 
+
+
+for m = 1 : test_size
+    i = padding + randi(img_size - padding - 1);
+    j = padding + randi(img_size - padding - 1);
+
+    input = img(i - padding : i + padding, j - padding : j + padding);
+    input = process(input);
+    
+    X_test(m, :) = input(:);
+    y_test(m) = bn(i, j);
+    
+%     n = n + 1;
+end 
+
+
+% y = y';
+
+
+%%
+% height = 3000;
+% y_interval = 101;
+
+% width = 3000;
+% x_interval = 101;
+
+
+% x_start = 1;
+% y_start = 1;
+% 
+% for i = 1 : width/x_interval
+%     for j = 1 : height/y_interval
+%         I = img(x_start:x_start+x_interval-1, y_start:y_start+y_interval-1);
+%         B = bn(x_start:x_start+x_interval-1, y_start:y_start+y_interval-1);
+%         
+%         imwrite(I, strcat(num2str(n), '.tif'));
+%         imwrite(B, strcat(num2str(n), '_b.tif'));
+%         
+%         y_start = y_start + y_interval;
+%         n = n + 1;
+%     end
+%     x_start = x_start + x_interval;
+%     y_start = 1;
+% 
+% end
+
 
 
 

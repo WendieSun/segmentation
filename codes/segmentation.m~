@@ -2,25 +2,44 @@
 clear ; close all; clc
 
 %% Setup the parameters you will use for this exercise
-height = 3000;
-width = 3000;
-x_interval = 101;
-y_interval = 101;
+% height = 3000;
+% % width = 3000;
+% x_width = 201;
+% y_width = 201;
+
+% 
+% TRAINING_START = 1;
+% NUM_OF_TRAINING = 35;
+% TEST_START = 36;
+% NUM_OF_TEST = 15;
+
+
+padding = 100;
+width = 2 * padding + 1;
+
 lambda = 2;
-max_runs = 100;
+max_runs = 200;
 threshold = 0.5;
 
 
-input_layer_size  = x_interval * y_interval; 
+input_layer_size  = width * width; 
 hidden_layer1_size = 25;   % 25 hidden units
 % output_layer_size = input_layer_size;
 output_layer_size = 1;
 
 %% =========== Part 0: Loading Data =============
 
-fprintf('\nLoading Data ...\n')
-
+% fprintf('\nLoading Data ...\n')
+% preprocess;
 loadinputs;
+
+% 
+% X_training = X(TRAINING_START : TRAINING_START + NUM_OF_TRAINING - 1, :);
+% y_training = y(TRAINING_START : TRAINING_START + NUM_OF_TRAINING - 1);
+% 
+% X_test = X(TEST_START : TEST_START + NUM_OF_TEST - 1, :);
+% y_test = y(TEST_START : TEST_START + NUM_OF_TEST - 1);
+
 % pause;
 
 %% ================ Part 1: Initializing Pameters ================
@@ -74,7 +93,7 @@ options = optimset('MaxIter', max_runs);
 costFunction = @(p) nnCostFunction_MA(p, ...
                                    input_layer_size, ...
                                    hidden_layer1_size, ...
-                                   output_layer_size, X, y, lambda);
+                                   output_layer_size, X_training, y_training, lambda);
 
 % Now, costFunction is a function that takes in only one argument (the
 % neural network parameters)
@@ -93,6 +112,11 @@ Theta2 = reshape(nn_params((1 + Theta1_size): end), ...
 fprintf('Program paused. Press enter to continue.\n');
 % pause;
 
+for i = 1 : m
+    X_training_i = X_training(1:i, :);
+    y_training_i = y_training(1:i, :);
+    
+    
 
 %% ================= Part 4: results =================
 %  After training the neural network, we would like to use it to predict
@@ -102,15 +126,17 @@ fprintf('Program paused. Press enter to continue.\n');
 
 % predict 
 fprintf('\npredict training dataset: \n');
-pred = predict_MA(Theta1, Theta2, X, threshold);
-compare_result(pred, y, threshold);
+training_pred = predict_MA(Theta1, Theta2, X_training, threshold);
+compare_result(training_pred, y_training, threshold);
 
 fprintf('\npredict new dataset: \n');
 test_pred = predict_MA(Theta1, Theta2, X_test, threshold);
-compare_result(test_pred, test_y, threshold);
+compare_result(test_pred, y_test, threshold);
 
 % analysis
-[training_accuracy, training_precision, training_recall, training_F_score] = errorAnalysis(pred, y);
+training_pred = (training_pred >= threshold);
+test_pred = (test_pred >= threshold);
+[training_accuracy, training_precision, training_recall, training_F_score] = errorAnalysis(training_pred, y_training);
 [test_accuracy, test_precision, test_recall, test_F_score] = errorAnalysis(test_pred, y_test);
 
 % dispay results
@@ -130,40 +156,52 @@ fprintf('%f\n', test_F_score * 100);
 img_width = 100;
 img_height = 100;
 
+
+
 test_img = imread('0.tif');
+% test_img = process(test_img);
 test_bin = imread('0_b.tif');
 
-test_img = test_img(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
-test_bin = test_bin(1 : 2 * y_interval + img_height, 1 : 2 * x_interval + img_width);
+test_img = test_img(1 : 2 * padding + img_height, 1 : 2 * padding + img_width);
+test_bin = test_bin(1 : 2 * padding + img_height, 1 : 2 * padding + img_width);
 
 n = 1;
 
-for i = x_interval + 1 : x_interval + img_width
-    for j = y_interval + 1 : y_interval + img_height
+% maybe need to randomise
+for i = padding + 1 : padding + img_width
+    for j = padding + 1 : padding + img_height
         
-        input = test_img(j - y_interval : j + y_interval, i - x_interval : i + x_interval);
+        input = test_img(j - padding : j + padding, i - padding : i + padding);
+        input = process(input);
 
-        X_test(n, :) = input(:);
+        test_img_X(n, :) = input(:);
 
         n = n + 1;
         
     end
 end
-
-
         
-y_test = 
-test_pred = predict_MA(Theta1, Theta2, X_test, y_test, threshold);
+test_img_pred = predict_MA(Theta1, Theta2, test_img_X, threshold);
+actual_img = test_bin(padding + 1 : padding + img_height, padding + 1 : x_padding + img_width);
+pred_img = reshape(test_img_pred, img_height, img_width);
+
+[test_accuracy, test_precision, test_recall, test_F_score] = errorAnalysis(test_img_pred, actual_img(:));
+
+fprintf('\n');
+fprintf('%f\n', test_accuracy * 100);
+fprintf('%f\n', test_precision * 100);
+fprintf('%f\n', test_recall * 100);
+fprintf('%f\n', test_F_score * 100);
+
+
+figure;
+imshowpair(pred_img, actual_img, 'montage');
 
 
 
 
-
-
-
-
-
-
+%  not equal amount of 1s and 0s in the training sample, will tend to
+%  predict everything as 1
 
 
 

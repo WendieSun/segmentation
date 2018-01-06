@@ -1,4 +1,5 @@
 function [accuracy, precision, recall, F_score] = errorAnalysis(pred, actual)
+% pred and actual only contains 0s and 1s
 
 % m = size(actual, 1);
 m = size(actual, 2);
