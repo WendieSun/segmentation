@@ -1,42 +1,63 @@
-% try to experiement with some image processing techniques
-% SIZE = 100;
 clear ; close all; clc
 
-IMAGE_SOURCE1 = '0.tif';
-IMAGE_SOURCE2 = '0_b.tif';
+%% load inputs
+loadinputs;
 
-GS = imread(IMAGE_SOURCE1);
-BN = imbinarize(imread(IMAGE_SOURCE2));
+%% PCA
 
-img = process(GS);
-img_ = imcrop(GS, [1264, 1114, 1618, 1887]);
-I = imcrop(img, [1264, 1114, 1618, 1887]);
-output = imcrop(BN, [1264, 1114, 1618, 1887]);
+X = X_training;
 
-% figure;
-% imshow(img);
+% mean normalisation
+[X_norm, mu, sigma] = featureNormalize(X);
+
+% run pca 
+[U, S] = pca(X_norm);
+
+%% choose the number of principle component (K)
+
+% number of features
+n = size(X, 2);
+
+% pick the smallest k that retains 99% of variance in the original set
+for k = 1 : n
+    variance_retained = sum(diag(S(1:k, 1:k))) / sum(diag(S));
+    if (variance_retained >= 0.99)
+        break;
+    end
+end
+
+% report the k found
+fprintf('the smallest k found: %d\n', k);
 
 
-% figure;
-% imshow(GS);
+%% reduce data dimension 
+
+% reduce dimension to the k found
+% K = k;
+% Z = projectData(X_norm, U, K);
+
+
+%% reconstruct and display 
 % 
-% figure;
-% imshow(BN);
-
-
-% % [I, rect] = imcrop(GS);
-% figure;
-% imshowpair(GS(126:226, 126:226), BN(126:226, 126:226), 'montage');
+% X_rec  = recoverData(Z, U, K);
 % 
-% figure;
-% imshowpair(process(GS), BN, 'montage');
-
-% [1264.51000000000]
-% [1114.51000000000]
-% [1618.98000000000]
-% [1886.98000000000]
+% % get number of examples
+% % m = size(X, 1);
 % 
-% I = imcrop(img, [1264, 1114, 1618, 1887]);
-% output = imcrop(BN, [1264, 1114, 1618, 1887]);
-figure;
-imshowpair(img_, I, 'montage');
+% % for the first 6 images, compare the reduced and the original ones
+% 
+% width = 21;
+% 
+% for i = 1:6
+%     original = reshape(X_training(i,:), width, width);
+%     reduced = reshape(X_rec(i, :), width, width);
+%     figure;
+%     imshowpair(original, reduced, 'montage');
+% end
+    
+
+
+
+
+
+

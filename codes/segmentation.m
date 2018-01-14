@@ -2,17 +2,6 @@
 clear ; close all; clc
 
 %% Setup the parameters you will use for this exercise
-% height = 3000;
-% % width = 3000;
-% x_width = 201;
-% y_width = 201;
-
-% 
-% TRAINING_START = 1;
-% NUM_OF_TRAINING = 35;
-% TEST_START = 36;
-% NUM_OF_TEST = 15;
-
 
 padding = 100;
 width = 2 * padding + 1;
@@ -22,27 +11,17 @@ max_runs = 200;
 threshold = 0.5;
 
 
-input_layer_size  = width * width; 
-hidden_layer1_size = 25;   % 25 hidden units
-% output_layer_size = input_layer_size;
+hidden_layer1_size = 25;  
 output_layer_size = 1;
 
 %% =========== Part 0: Loading Data =============
 
-% fprintf('\nLoading Data ...\n')
-% preprocess;
+fprintf('\nLoading Data ...\n')
+
 loadinputs;
 
-% 
-% X_training = X(TRAINING_START : TRAINING_START + NUM_OF_TRAINING - 1, :);
-% y_training = y(TRAINING_START : TRAINING_START + NUM_OF_TRAINING - 1);
-% 
-% X_test = X(TEST_START : TEST_START + NUM_OF_TEST - 1, :);
-% y_test = y(TEST_START : TEST_START + NUM_OF_TEST - 1);
 
-% pause;
-
-%% ================ Part 1: Initializing Pameters ================
+%% ================  Initializing Pameters ================
 %  In this part of the exercise, you will be starting to implment a two
 %  layer neural network that classifies digits. You will start by
 %  implementing a function to initialize the weights of the neural network
@@ -59,7 +38,7 @@ loadinputs;
 
 
 
-%% =============== Part 2: Gradient checking ===============
+%% =============== Gradient checking ===============
 %  Once your backpropagation implementation is correct, you should now
 %  continue to implement the regularization with the cost and gradient.
 % %
@@ -73,7 +52,7 @@ loadinputs;
 % fprintf('Program paused. Press enter to continue.\n');
 % % pause;
 
-%% =================== Part 3: Training NN ===================
+%% ===================  Training NN ===================
 %  You have now implemented all the code necessary to train a neural 
 %  network. To train your neural network, we will now use "fmincg", which
 %  is a function which works similarly to "fminunc". Recall that these
@@ -112,6 +91,56 @@ loadinputs;
 % fprintf('Program paused. Press enter to continue.\n');
 % % pause;
 
+%% ========= choose the number of principle component (K)========
+
+fprintf('\nChoosing k  ... \n');
+
+% mean normalisation
+[X_norm, mu, sigma] = featureNormalize(double(X_training));
+
+% run pca 
+[U, S] = pca(X_norm);
+
+% number of features
+n = size(X_training, 2);
+
+% pick the smallest k that retains 99% of variance in the original set
+for K = 1 : n
+    variance_retained = sum(diag(S(1:K, 1:K))) / sum(diag(S));
+    if (variance_retained >= 0.99)
+        break;
+    end
+end
+
+% report the k found
+fprintf('the smallest k found: %d\n', K);
+input_layer_size  = K;
+
+%% =============== training set dimension reduction ===============
+
+fprintf('\nDimension reduction  ... \n');
+
+
+% Project the data onto lower dimension, can change K later
+Z_training = projectData(X_norm, U, K);
+
+X_training = Z_training;
+
+
+
+%% =============== test set dimension reduction ===============
+
+% mean normalisation
+[X_norm, mu, sigma] = featureNormalize(double(X_test));
+
+% run pca 
+[U, S] = pca(X_norm);
+
+% Project the data onto lower dimension, can change K later
+Z_test = projectData(X_norm, U, K);
+
+X_test = Z_test;
+
 
 %% =================== Plot Learning Curve ===================
 fprintf('\npreparing data for learning curve... \n');
@@ -121,16 +150,20 @@ test_size = size(X_test, 1);
 
 options = optimset('MaxIter', max_runs);
 
-%  You should also try different values of lambda
-% lambda = 3;
 
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction_MA(p, ...
                                    input_layer_size, ...
                                    hidden_layer1_size, ...
                                    output_layer_size, X_training, y_training, lambda);
+
 f_score_train = zeros(training_size, 1);
+
 f_score_test = zeros(training_size, 1);
+
+accuracy_train = zeros(training_size, 1);
+
+accuracy_test = zeros(training_size, 1);
 
 for i = 1 : training_size
     X_training_i = X_training(1:i, :);
@@ -162,6 +195,8 @@ for i = 1 : training_size
     
     f_score_train(i) = train_F_score_i;
     
+    accuracy_train(i) = train_accuracy_i;
+    
     
     % test set
     
@@ -173,16 +208,23 @@ for i = 1 : training_size
     
     f_score_test(i) = test_F_score_i;
     
+    accuracy_test(i) = test_accuracy_i;
+    
     
 end
 
+% plot 
+figure;
+plot(1:training_size, f_score_train, 1:training_size, f_score_test);
+title('Learning curve');
+legend('Train', 'Test');
+xlabel('Number of training examples');
+ylabel('f_score');
 
-plot(1:training_size, f_score_train, 1:test_size, f_score_test);
-title('Learning curve')
-legend('Train', 'Test')
-xlabel('Number of training examples')
-ylabel('f_score')
-% axis([0 13 0 150])
+
+
+% y start at 0
+ylim([0 inf]);
 
 %% ================= Part 4: results =================
 %  After training the neural network, we would like to use it to predict
