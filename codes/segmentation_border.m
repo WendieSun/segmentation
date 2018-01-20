@@ -1,22 +1,29 @@
+% use the surrounding pixels to predict the whether a pixel is part of 
+% a mitochondrion
+
 %% Initialization
 clear ; close all; clc
 
-%% Setup the parameters you will use for this exercise
+%% Set up the parameters and constants
 
-padding = 100;
-width = 2 * padding + 1;
+% input information
+border = 10;
+input_width = 2 * border + 1;
 
+% parameters for training 
 lambda = 2;
 max_runs = 200;
+
+% threshold for predicting whether a pixel is part of a mitochondrion
 threshold = 0.5;
 
-
-hidden_layer1_size = 25;   % 25 hidden units
+% neural network structure
+hidden_layer1_size = 25;  
 output_layer_size = 1;
 
-%% =========== Part 0: Loading Data =============
+%% Load Data 
 
-% fprintf('\nLoading Data ...\n')
+fprintf('\nLoading Data ...\n')
 
 loadinputs;
 
@@ -91,7 +98,9 @@ loadinputs;
 % fprintf('Program paused. Press enter to continue.\n');
 % % pause;
 
-%% ========= choose the number of principle component (K)========
+%% Choose the number of principle component (K)
+
+fprintf('\nChoosing k  ... \n');
 
 % mean normalisation
 [X_norm, mu, sigma] = featureNormalize(double(X_training));
@@ -110,24 +119,22 @@ for K = 1 : n
     end
 end
 
-% report the k found
+% report the K found
 fprintf('the smallest k found: %d\n', K);
+input_layer_size  = K;
 
-%% =============== training set dimension reduction ===============
+
+%% training set dimension reduction 
 
 fprintf('\nDimension reduction  ... \n');
 
-
-% Project the data onto lower dimension, can change K later
+% Project the data onto the lower dimension
 Z_training = projectData(X_norm, U, K);
-
 
 X_training = Z_training;
 
 
-
-%% =============== test set dimension reduction ===============
-
+%% test set dimension reduction
 
 % mean normalisation
 [X_norm, mu, sigma] = featureNormalize(double(X_test));
@@ -137,7 +144,6 @@ X_training = Z_training;
 
 % Project the data onto lower dimension, can change K later
 Z_test = projectData(X_norm, U, K);
-
 
 X_test = Z_test;
 
@@ -150,17 +156,20 @@ test_size = size(X_test, 1);
 
 options = optimset('MaxIter', max_runs);
 
-%  You should also try different values of lambda
-% lambda = 3;
 
 % Create "short hand" for the cost function to be minimized
 costFunction = @(p) nnCostFunction_MA(p, ...
                                    input_layer_size, ...
                                    hidden_layer1_size, ...
                                    output_layer_size, X_training, y_training, lambda);
+
 f_score_train = zeros(training_size, 1);
 
 f_score_test = zeros(training_size, 1);
+
+accuracy_train = zeros(training_size, 1);
+
+accuracy_test = zeros(training_size, 1);
 
 for i = 1 : training_size
     X_training_i = X_training(1:i, :);
@@ -192,6 +201,8 @@ for i = 1 : training_size
     
     f_score_train(i) = train_F_score_i;
     
+    accuracy_train(i) = train_accuracy_i;
+    
     
     % test set
     
@@ -203,15 +214,20 @@ for i = 1 : training_size
     
     f_score_test(i) = test_F_score_i;
     
+    accuracy_test(i) = test_accuracy_i;
+    
     
 end
 
+% plot 
 figure;
 plot(1:training_size, f_score_train, 1:training_size, f_score_test);
 title('Learning curve');
 legend('Train', 'Test');
 xlabel('Number of training examples');
 ylabel('f_score');
+
+
 
 % y start at 0
 ylim([0 inf]);
