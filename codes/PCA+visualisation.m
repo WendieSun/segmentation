@@ -1,6 +1,10 @@
+%% Initialization
 clear ; close all; clc
 
-%% load inputs
+%% Set up the variables and constants
+loadVariables;
+
+%% Load Data 
 loadinputs;
 
 %% PCA
@@ -33,27 +37,21 @@ fprintf('the smallest k found: %d\n', k);
 %% reduce data dimension 
 
 % reduce dimension to the k found
-% K = k;
-% Z = projectData(X_norm, U, K);
+K = k;
+Z = projectData(X_norm, U, K);
 
 
 %% reconstruct and display 
-% 
-% X_rec  = recoverData(Z, U, K);
-% 
-% % get number of examples
-% % m = size(X, 1);
-% 
-% % for the first 6 images, compare the reduced and the original ones
-% 
-% width = 21;
-% 
-% for i = 1:6
-%     original = reshape(X_training(i,:), width, width);
-%     reduced = reshape(X_rec(i, :), width, width);
-%     figure;
-%     imshowpair(original, reduced, 'montage');
-% end
+
+X_rec  = recoverData(Z, U, K);
+
+% for the first 6 images, compare the reduced and the original ones
+for i = 1:6
+    original = reshape(X_training(i,:), input_width, input_width);
+    reduced = reshape(X_rec(i, :), input_width, input_width);
+    figure;
+    imshowpair(original, reduced, 'montage');
+end
     
 
 

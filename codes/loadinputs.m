@@ -1,11 +1,3 @@
-
-%% Setup the parameters and constants
-
-border = 10;
-
-training_size = 500;
-test_size = 70;
-
 %% read in the input image
 
 img = double(imread(strcat('0.tif')));
@@ -39,7 +31,7 @@ for m = 1 : training_size
     
     % get the surrounding pixels of the point and process them  
     input = img(i - border : i + border, j - border : j + border);
-    input = process(input);
+%     input = process(input);
     
     % put into X and y
     X_training(m, :) = input(:);
@@ -57,15 +49,15 @@ for m = 1 : test_size
     i = border + randi(img_height - 2 * border);
     j = border + randi(img_width - 2 * border);
 
-%     % alternate between 1 and 0
-%     output = (output == 0);
-%     while bn(i, j) ~= output
-%         i = border + randi(img_height - 2 * border);
-%         j = border + randi(img_width - 2 * border);
-%     end
+    % alternate between 1 and 0
+    output = (output == 0);
+    while bn(i, j) ~= output
+        i = border + randi(img_height - 2 * border);
+        j = border + randi(img_width - 2 * border);
+    end
 
     input = img(i - border : i + border, j - border : j + border);
-    input = process(input);
+%     input = process(input);
     
     X_test(m, :) = input(:);
     y_test(m) = bn(i, j);

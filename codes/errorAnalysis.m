@@ -1,14 +1,7 @@
 function [accuracy, precision, recall, F_score] = errorAnalysis(pred, actual)
 % pred and actual only contains 0s and 1s
 
-% m = size(actual, 1);
 m = size(actual, 2);
-% 
-% accuracy = 0;
-% precision = 0;
-% recall = 0;
-% F_score = 0;
-
 
 % accuracy
 accuracy = sum(pred == actual)/m;
@@ -24,6 +17,7 @@ recall = true_positive / actual_positive;
 
 % F_score
 F_score = 2 * precision * recall / (precision + recall);
+
 
 % for i = 1 : m
 %     actual_i = actual(i, :);
