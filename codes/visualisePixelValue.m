@@ -1,8 +1,5 @@
 %% Initialization
-clear ; close all; clc
-
-%% Set up the variables and constants
-loadVariables;
+clear ; close all; clc;
 
 %% Load Data 
 GRAYSCALE_FILE = '0.tif';

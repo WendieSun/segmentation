@@ -17,5 +17,5 @@ hidden_layer1_size = 25;
 output_layer_size = 1;
 
 % training_size
-training_size = 60;
-test_size = 5;
+training_size = 1000;
+test_size = 50;

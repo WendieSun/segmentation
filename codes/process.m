@@ -1,4 +1,5 @@
 function img = process(img_before)
+% process images
 
 img = img_before;
 
